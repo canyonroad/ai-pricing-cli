@@ -1,5 +1,5 @@
 {
-  "name": "ai-pricing",
+  "name": "@ai-pricing/cli",
   "version": "0.1.0",
   "description": "CLI for the ai-pricing.fyi public API",
   "type": "module",
