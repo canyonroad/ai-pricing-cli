@@ -32,8 +32,6 @@ describe("cli root", () => {
     expect(stdout).toContain("models");
     expect(stdout).toContain("prices");
     expect(stdout).toContain("changes");
-    expect(stdout).toContain("gpus");
-    expect(stdout).toContain("health");
   });
 
   it("exits 1 on unknown commands", () => {

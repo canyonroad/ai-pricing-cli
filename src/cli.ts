@@ -2,8 +2,7 @@ import { Command, type CommanderError, Option } from "commander";
 import pkg from "../package.json" with { type: "json" };
 import { ApiError } from "./api/client.js";
 import * as changesCmd from "./commands/changes.js";
-import * as gpusCmd from "./commands/gpus.js";
-import * as healthCmd from "./commands/health.js";
+
 import * as modelsCmd from "./commands/models.js";
 import * as pricesCmd from "./commands/prices.js";
 import * as providersCmd from "./commands/providers.js";
@@ -45,8 +44,6 @@ function buildProgram(): Command {
   modelsCmd.register(program);
   pricesCmd.register(program);
   changesCmd.register(program);
-  gpusCmd.register(program);
-  healthCmd.register(program);
 
   return program;
 }

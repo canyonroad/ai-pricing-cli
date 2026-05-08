@@ -3,7 +3,6 @@ import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 
 const CLI = resolve(__dirname, "..", "dist", "cli.js");
-const RUN_LIVE = process.env.RUN_SMOKE === "1";
 
 function run(args: string[], env: Record<string, string> = {}): { stdout: string; code: number } {
   try {
@@ -33,12 +32,5 @@ describe("cli smoke", () => {
     expect(env.ok).toBe(false);
     expect(env.error.code).toBe("network");
     expect(code).toBe(5);
-  });
-
-  it.runIf(RUN_LIVE)("hits the live /_health endpoint and prints a JSON envelope", () => {
-    const { stdout, code } = run(["health", "--json"]);
-    const env = JSON.parse(stdout);
-    expect(env.ok).toBe(true);
-    expect(code).toBe(0);
   });
 });
