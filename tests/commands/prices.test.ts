@@ -1,10 +1,12 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import * as client from "../../src/api/client.js";
+import * as prices from "../../src/commands/prices.js";
 import * as json from "../../src/output/json.js";
 import * as table from "../../src/output/table.js";
-import * as prices from "../../src/commands/prices.js";
 
-afterEach(() => { vi.restoreAllMocks(); });
+afterEach(() => {
+  vi.restoreAllMocks();
+});
 
 const SAMPLE_ROW = {
   provider_slug: "anthropic",

@@ -17,7 +17,13 @@ export class ApiError extends Error {
   readonly url: string;
   readonly body?: unknown;
 
-  constructor(opts: { code: ApiErrorCode; status?: number; url: string; message: string; body?: unknown }) {
+  constructor(opts: {
+    code: ApiErrorCode;
+    status?: number;
+    url: string;
+    message: string;
+    body?: unknown;
+  }) {
     super(opts.message);
     this.name = "ApiError";
     this.code = opts.code;
@@ -90,7 +96,10 @@ export async function apiGet<T>(
       const code: ApiErrorCode =
         res.status === 404 ? "not_found" : res.status === 429 ? "rate_limited" : "http_error";
       const message =
-        (typeof body === "object" && body !== null && "error" in body && typeof (body as { error: unknown }).error === "string"
+        (typeof body === "object" &&
+        body !== null &&
+        "error" in body &&
+        typeof (body as { error: unknown }).error === "string"
           ? (body as { error: string }).error
           : null) ?? `HTTP ${res.status} from ${url}`;
       throw new ApiError({ code, status: res.status, url, message, body });
@@ -100,7 +109,11 @@ export async function apiGet<T>(
   } catch (err) {
     if (err instanceof ApiError) throw err;
     if (err instanceof Error && err.name === "AbortError") {
-      throw new ApiError({ code: "timeout", url, message: `Request to ${url} timed out after ${timeoutMs}ms` });
+      throw new ApiError({
+        code: "timeout",
+        url,
+        message: `Request to ${url} timed out after ${timeoutMs}ms`,
+      });
     }
     const message = err instanceof Error ? err.message : String(err);
     throw new ApiError({ code: "network", url, message: `Network error: ${message}` });

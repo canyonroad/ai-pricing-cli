@@ -1,6 +1,6 @@
-import { describe, expect, it } from "vitest";
 import { execFileSync } from "node:child_process";
 import { resolve } from "node:path";
+import { describe, expect, it } from "vitest";
 
 const CLI = resolve(__dirname, "..", "dist", "cli.js");
 const RUN_LIVE = process.env.RUN_SMOKE === "1";
@@ -26,7 +26,9 @@ describe("cli smoke", () => {
   });
 
   it("emits a JSON error envelope when piped (stdout not a TTY) and the host is unreachable", () => {
-    const { stdout, code } = run(["providers", "list"], { AI_PRICING_BASE_URL: "http://127.0.0.1:1" });
+    const { stdout, code } = run(["providers", "list"], {
+      AI_PRICING_BASE_URL: "http://127.0.0.1:1",
+    });
     const env = JSON.parse(stdout);
     expect(env.ok).toBe(false);
     expect(env.error.code).toBe("network");

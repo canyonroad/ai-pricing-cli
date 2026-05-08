@@ -1,12 +1,12 @@
-import { Command, CommanderError, Option } from "commander";
+import { Command, type CommanderError, Option } from "commander";
 import pkg from "../package.json" with { type: "json" };
 import { ApiError } from "./api/client.js";
-import * as providersCmd from "./commands/providers.js";
-import * as modelsCmd from "./commands/models.js";
-import * as pricesCmd from "./commands/prices.js";
 import * as changesCmd from "./commands/changes.js";
 import * as gpusCmd from "./commands/gpus.js";
 import * as healthCmd from "./commands/health.js";
+import * as modelsCmd from "./commands/models.js";
+import * as pricesCmd from "./commands/prices.js";
+import * as providersCmd from "./commands/providers.js";
 import { CliError, exitCodeFor } from "./output/errors.js";
 import { buildErrorEnvelope, renderJson } from "./output/json.js";
 import { chooseMode } from "./output/mode.js";
@@ -32,7 +32,11 @@ function buildProgram(): Command {
     .addOption(new Option("--json", "force JSON output"))
     .addOption(new Option("--table", "force table output"))
     .addOption(new Option("--base-url <url>", "override base URL").env("AI_PRICING_BASE_URL"))
-    .addOption(new Option("--timeout <ms>", "request timeout in ms").default(30000).argParser((v) => Number(v)))
+    .addOption(
+      new Option("--timeout <ms>", "request timeout in ms")
+        .default(30000)
+        .argParser((v) => Number(v)),
+    )
     .addOption(new Option("--no-color", "disable ANSI color in tables"))
     .showHelpAfterError(true)
     .exitOverride();
@@ -62,7 +66,10 @@ async function main(): Promise<void> {
   try {
     await program.parseAsync(process.argv);
   } catch (err) {
-    if (err instanceof Error && (err.name === "CommanderError" || err.name === "InvalidArgumentError")) {
+    if (
+      err instanceof Error &&
+      (err.name === "CommanderError" || err.name === "InvalidArgumentError")
+    ) {
       process.exit("exitCode" in err ? (err as CommanderError).exitCode : 1);
     }
     if (err instanceof ApiError || err instanceof CliError || err instanceof Error) {

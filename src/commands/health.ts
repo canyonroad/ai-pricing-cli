@@ -1,7 +1,7 @@
-import { Command } from "commander";
-import { apiGet, type ClientOpts } from "../api/client.js";
+import type { Command } from "commander";
+import { type ClientOpts, apiGet } from "../api/client.js";
 import type { GlobalOpts } from "../cli.js";
-import { renderJson, buildSuccessEnvelope } from "../output/json.js";
+import { buildSuccessEnvelope, renderJson } from "../output/json.js";
 import { chooseMode } from "../output/mode.js";
 import { renderKeyValueTable, writeTable } from "../output/table.js";
 

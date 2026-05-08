@@ -1,11 +1,17 @@
-import { Command } from "commander";
-import { apiGet, type ClientOpts } from "../api/client.js";
+import type { Command } from "commander";
+import { type ClientOpts, apiGet } from "../api/client.js";
 import type { GlobalOpts } from "../cli.js";
-import { renderJson, buildSuccessEnvelope } from "../output/json.js";
+import { buildSuccessEnvelope, renderJson } from "../output/json.js";
 import { chooseMode } from "../output/mode.js";
 import { renderTable, writeTable } from "../output/table.js";
 
-const CHANGES_COLUMNS = ["observed_at", "provider_slug", "canonical_slug", "metric", "price_change"];
+const CHANGES_COLUMNS = [
+  "observed_at",
+  "provider_slug",
+  "canonical_slug",
+  "metric",
+  "price_change",
+];
 
 function clientOptsFrom(g: GlobalOpts): ClientOpts {
   return { baseUrl: g.baseUrl, timeoutMs: g.timeout };

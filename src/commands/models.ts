@@ -1,12 +1,19 @@
-import { Command } from "commander";
-import { apiGet, type ClientOpts } from "../api/client.js";
+import type { Command } from "commander";
+import { type ClientOpts, apiGet } from "../api/client.js";
 import type { GlobalOpts } from "../cli.js";
-import { renderJson, buildSuccessEnvelope } from "../output/json.js";
+import { buildSuccessEnvelope, renderJson } from "../output/json.js";
 import { chooseMode } from "../output/mode.js";
 import { renderKeyValueTable, renderTable, writeTable } from "../output/table.js";
 
 const MODELS_LIST_COLUMNS = ["canonical_slug", "vendor", "family", "display_name", "status"];
-const MODEL_OFFERS_COLUMNS = ["provider_slug", "metric", "unit", "price_numeric", "batch_flag", "latest_observed_at"];
+const MODEL_OFFERS_COLUMNS = [
+  "provider_slug",
+  "metric",
+  "unit",
+  "price_numeric",
+  "batch_flag",
+  "latest_observed_at",
+];
 
 function clientOptsFrom(g: GlobalOpts): ClientOpts {
   return { baseUrl: g.baseUrl, timeoutMs: g.timeout };
@@ -32,7 +39,11 @@ export async function runList(flags: ListFlags, g: GlobalOpts): Promise<void> {
 }
 
 export async function runGet(slug: string, g: GlobalOpts): Promise<void> {
-  const response = await apiGet<Record<string, unknown>>(`/v1/models/${encodeURIComponent(slug)}`, undefined, clientOptsFrom(g));
+  const response = await apiGet<Record<string, unknown>>(
+    `/v1/models/${encodeURIComponent(slug)}`,
+    undefined,
+    clientOptsFrom(g),
+  );
   if (mode(g) === "json") {
     renderJson(buildSuccessEnvelope(response));
   } else {

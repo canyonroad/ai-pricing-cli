@@ -1,10 +1,12 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import * as client from "../../src/api/client.js";
+import * as changes from "../../src/commands/changes.js";
 import * as json from "../../src/output/json.js";
 import * as table from "../../src/output/table.js";
-import * as changes from "../../src/commands/changes.js";
 
-afterEach(() => { vi.restoreAllMocks(); });
+afterEach(() => {
+  vi.restoreAllMocks();
+});
 
 describe("changes recent", () => {
   it("calls /v1/changes/recent with --limit", async () => {

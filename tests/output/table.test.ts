@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
-  formatPrice,
   formatCell,
+  formatPrice,
   renderKeyValueTable,
   renderTable,
 } from "../../src/output/table.js";

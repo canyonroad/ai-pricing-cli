@@ -1,7 +1,7 @@
-import { Command } from "commander";
-import { apiGet, type ClientOpts } from "../api/client.js";
+import type { Command } from "commander";
+import { type ClientOpts, apiGet } from "../api/client.js";
 import type { GlobalOpts } from "../cli.js";
-import { renderJson, buildSuccessEnvelope } from "../output/json.js";
+import { buildSuccessEnvelope, renderJson } from "../output/json.js";
 import { chooseMode } from "../output/mode.js";
 import { renderKeyValueTable, renderTable, writeTable } from "../output/table.js";
 
@@ -41,7 +41,11 @@ export async function runList(flags: ListFlags, g: GlobalOpts): Promise<void> {
 }
 
 export async function runGet(slug: string, g: GlobalOpts): Promise<void> {
-  const response = await apiGet<Record<string, unknown>>(`/v1/providers/${encodeURIComponent(slug)}`, undefined, clientOptsFrom(g));
+  const response = await apiGet<Record<string, unknown>>(
+    `/v1/providers/${encodeURIComponent(slug)}`,
+    undefined,
+    clientOptsFrom(g),
+  );
   if (mode(g) === "json") {
     renderJson(buildSuccessEnvelope(response));
   } else {

@@ -28,6 +28,9 @@ export function buildErrorEnvelope(err: unknown): ErrorEnvelope {
   return { ok: false, error: { code: "unknown", message } };
 }
 
-export function renderJson(envelope: SuccessEnvelope | ErrorEnvelope, stream: NodeJS.WriteStream = process.stdout): void {
+export function renderJson(
+  envelope: SuccessEnvelope | ErrorEnvelope,
+  stream: NodeJS.WriteStream = process.stdout,
+): void {
   stream.write(`${JSON.stringify(envelope, null, 2)}\n`);
 }

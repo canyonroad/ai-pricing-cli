@@ -27,7 +27,12 @@ describe("buildSuccessEnvelope", () => {
 
 describe("buildErrorEnvelope", () => {
   it("converts an ApiError to the standard envelope", () => {
-    const err = new ApiError({ code: "not_found", status: 404, url: "https://x/y", message: "nope" });
+    const err = new ApiError({
+      code: "not_found",
+      status: 404,
+      url: "https://x/y",
+      message: "nope",
+    });
     expect(buildErrorEnvelope(err)).toEqual({
       ok: false,
       error: { code: "not_found", status: 404, url: "https://x/y", message: "nope" },

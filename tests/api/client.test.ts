@@ -3,10 +3,14 @@ import { ApiError, apiGet } from "../../src/api/client.js";
 
 afterEach(() => {
   vi.unstubAllGlobals();
-  delete process.env.AI_PRICING_BASE_URL;
+  process.env.AI_PRICING_BASE_URL = undefined;
 });
 
-function mockFetch(response: { status?: number; body?: unknown; headers?: Record<string, string> }) {
+function mockFetch(response: {
+  status?: number;
+  body?: unknown;
+  headers?: Record<string, string>;
+}) {
   const status = response.status ?? 200;
   const headers = new Headers(response.headers ?? { "content-type": "application/json" });
   const body = JSON.stringify(response.body ?? {});
@@ -19,39 +23,44 @@ describe("apiGet — URL composition", () => {
   it("uses the default base URL when no override", async () => {
     const fn = mockFetch({ body: { data: [] } });
     await apiGet("/v1/providers");
-    expect(fn.mock.calls[0]?.[0]).toBe("https://ai-pricing.fyi/v1/providers");
+    expect((fn.mock.calls[0] as unknown[])?.[0]).toBe("https://ai-pricing.fyi/v1/providers");
   });
 
   it("uses opts.baseUrl when provided", async () => {
     const fn = mockFetch({ body: {} });
     await apiGet("/v1/providers", undefined, { baseUrl: "http://localhost:8787" });
-    expect(fn.mock.calls[0]?.[0]).toBe("http://localhost:8787/v1/providers");
+    expect((fn.mock.calls[0] as unknown[])?.[0]).toBe("http://localhost:8787/v1/providers");
   });
 
   it("uses AI_PRICING_BASE_URL when opts.baseUrl is absent", async () => {
     process.env.AI_PRICING_BASE_URL = "https://example.test";
     const fn = mockFetch({ body: {} });
     await apiGet("/v1/providers");
-    expect(fn.mock.calls[0]?.[0]).toBe("https://example.test/v1/providers");
+    expect((fn.mock.calls[0] as unknown[])?.[0]).toBe("https://example.test/v1/providers");
   });
 
   it("opts.baseUrl wins over the env var", async () => {
     process.env.AI_PRICING_BASE_URL = "https://env.test";
     const fn = mockFetch({ body: {} });
     await apiGet("/v1/providers", undefined, { baseUrl: "https://opts.test" });
-    expect(fn.mock.calls[0]?.[0]).toBe("https://opts.test/v1/providers");
+    expect((fn.mock.calls[0] as unknown[])?.[0]).toBe("https://opts.test/v1/providers");
   });
 
   it("trims a trailing slash from the base URL", async () => {
     const fn = mockFetch({ body: {} });
     await apiGet("/v1/providers", undefined, { baseUrl: "http://localhost:8787/" });
-    expect(fn.mock.calls[0]?.[0]).toBe("http://localhost:8787/v1/providers");
+    expect((fn.mock.calls[0] as unknown[])?.[0]).toBe("http://localhost:8787/v1/providers");
   });
 
   it("encodes query parameters and drops undefined values", async () => {
     const fn = mockFetch({ body: {} });
-    await apiGet("/v1/prices/current", { provider: "anthropic", limit: 5, missing: undefined, batch: true });
-    const url = fn.mock.calls[0]?.[0] as string;
+    await apiGet("/v1/prices/current", {
+      provider: "anthropic",
+      limit: 5,
+      missing: undefined,
+      batch: true,
+    });
+    const url = (fn.mock.calls[0] as unknown[])?.[0] as string;
     expect(url).toContain("provider=anthropic");
     expect(url).toContain("limit=5");
     expect(url).toContain("batch=true");
@@ -61,14 +70,14 @@ describe("apiGet — URL composition", () => {
   it("URL-encodes characters in query values", async () => {
     const fn = mockFetch({ body: {} });
     await apiGet("/v1/prices/current", { q: "claude opus & friends" });
-    const url = fn.mock.calls[0]?.[0] as string;
+    const url = (fn.mock.calls[0] as unknown[])?.[0] as string;
     expect(url).toContain("q=claude+opus+%26+friends");
   });
 
   it("sends Accept and User-Agent headers", async () => {
     const fn = mockFetch({ body: {} });
     await apiGet("/v1/providers");
-    const init = fn.mock.calls[0]?.[1] as RequestInit;
+    const init = (fn.mock.calls[0] as unknown[])?.[1] as RequestInit;
     const headers = new Headers(init.headers);
     expect(headers.get("accept")).toBe("application/json");
     expect(headers.get("user-agent")).toMatch(/^ai-pricing-cli\/\d+\.\d+\.\d+$/);
@@ -83,7 +92,12 @@ describe("apiGet — URL composition", () => {
 
 describe("ApiError class", () => {
   it("is throwable and carries code, status, url", () => {
-    const err = new ApiError({ code: "not_found", status: 404, url: "https://x/y", message: "nope" });
+    const err = new ApiError({
+      code: "not_found",
+      status: 404,
+      url: "https://x/y",
+      message: "nope",
+    });
     expect(err).toBeInstanceOf(Error);
     expect(err.code).toBe("not_found");
     expect(err.status).toBe(404);
@@ -135,22 +149,36 @@ describe("apiGet — error mapping", () => {
   });
 
   it("maps a non-JSON body to 'parse_error'", async () => {
-    const fn = vi.fn(async () => new Response("<html>500</html>", { status: 500, headers: { "content-type": "text/html" } }));
+    const fn = vi.fn(
+      async () =>
+        new Response("<html>500</html>", { status: 500, headers: { "content-type": "text/html" } }),
+    );
     vi.stubGlobal("fetch", fn);
-    await expect(apiGet("/v1/providers")).rejects.toMatchObject({ code: "parse_error", status: 500 });
+    await expect(apiGet("/v1/providers")).rejects.toMatchObject({
+      code: "parse_error",
+      status: 500,
+    });
   });
 
   it("maps fetch reject to 'network'", async () => {
-    vi.stubGlobal("fetch", vi.fn(async () => { throw new TypeError("getaddrinfo ENOTFOUND"); }));
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => {
+        throw new TypeError("getaddrinfo ENOTFOUND");
+      }),
+    );
     await expect(apiGet("/v1/providers")).rejects.toMatchObject({ code: "network" });
   });
 
   it("maps abort/timeout to 'timeout'", async () => {
-    vi.stubGlobal("fetch", vi.fn(async () => {
-      const err = new Error("aborted");
-      err.name = "AbortError";
-      throw err;
-    }));
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => {
+        const err = new Error("aborted");
+        err.name = "AbortError";
+        throw err;
+      }),
+    );
     await expect(apiGet("/v1/providers", undefined, { timeoutMs: 10 })).rejects.toMatchObject({
       code: "timeout",
     });
