@@ -1,6 +1,12 @@
 import { Command, CommanderError, Option } from "commander";
 import pkg from "../package.json" with { type: "json" };
 import { ApiError } from "./api/client.js";
+import * as providersCmd from "./commands/providers.js";
+import * as modelsCmd from "./commands/models.js";
+import * as pricesCmd from "./commands/prices.js";
+import * as changesCmd from "./commands/changes.js";
+import * as gpusCmd from "./commands/gpus.js";
+import * as healthCmd from "./commands/health.js";
 import { CliError, exitCodeFor } from "./output/errors.js";
 import { buildErrorEnvelope, renderJson } from "./output/json.js";
 import { chooseMode } from "./output/mode.js";
@@ -31,18 +37,14 @@ function buildProgram(): Command {
     .showHelpAfterError(true)
     .exitOverride();
 
-  program.command("providers").description("Provider commands").action(() => stubAction("providers"));
-  program.command("models").description("Model commands").action(() => stubAction("models"));
-  program.command("prices").description("Price commands").action(() => stubAction("prices"));
-  program.command("changes").description("Recent price changes").action(() => stubAction("changes"));
-  program.command("gpus").description("GPU compute pricing").action(() => stubAction("gpus"));
-  program.command("health").description("Liveness check").action(() => stubAction("health"));
+  providersCmd.register(program);
+  modelsCmd.register(program);
+  pricesCmd.register(program);
+  changesCmd.register(program);
+  gpusCmd.register(program);
+  healthCmd.register(program);
 
   return program;
-}
-
-function stubAction(name: string): never {
-  throw new CliError(`subcommand '${name}' not implemented yet`);
 }
 
 export function reportError(err: unknown, opts: GlobalOpts): void {
