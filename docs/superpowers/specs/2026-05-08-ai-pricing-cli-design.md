@@ -199,7 +199,7 @@ Available on every list/offers command in table mode:
 
 ### Mode resolution (`src/output/mode.ts`)
 
-1. `--json` flag → `json`
+1. `--json` flag → `json` (wins if `--table` is also passed)
 2. `--table` flag → `table`
 3. `process.stdout.isTTY === true` → `table`
 4. Otherwise → `json`
@@ -213,20 +213,22 @@ non-TTY anyway and naturally land on JSON.
 Always wraps the server response. Shape:
 
 ```jsonc
-// Success — passes through whatever the server returned, plus ok + meta.
+// Success — passes through whatever the server returned, plus `ok`.
+// The server's own `meta` block (timing, D1 read counts) flows through
+// untouched. The CLI does NOT add fields that could collide with server
+// fields.
 {
   "ok": true,
   "data": [ /* when the server returned {data: ...} */ ],
   "limit": 50, "offset": 0,                  // passed through when present
-  "meta": { "url": "https://ai-pricing.fyi/v1/providers?limit=50", "ms": 124 }
+  "meta": { /* server's meta, untouched */ }
 }
 ```
 
 For endpoints that do not use a `data` envelope (e.g. `/v1/prices/filters`
 returns `{providers, families, ...}`, `/v1/changes/recent` returns
-`{changes}`), the envelope spreads the top-level keys alongside `ok` and
-`meta` instead of forcing them under `data`. Rule: **server response
-+ `ok` + `meta`**.
+`{changes}`), the envelope spreads the top-level keys alongside `ok`
+instead of forcing them under `data`. Rule: **server response + `ok`**.
 
 ```jsonc
 // Error
