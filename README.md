@@ -1,4 +1,4 @@
-# ai-pricing
+# @ai-pricing/cli
 
 CLI for the public read API at https://ai-pricing.fyi.
 
@@ -7,9 +7,9 @@ Both human-friendly (pretty tables on a TTY) and agent-friendly (JSON envelope w
 ## Install
 
 ```bash
-npm i -g ai-pricing
+npm i -g @ai-pricing/cli
 # or one-shot
-npx ai-pricing providers list
+npx @ai-pricing/cli providers list
 ```
 
 Requires Node 20+.
@@ -24,8 +24,6 @@ ai-pricing prices current --provider anthropic --metric input_token --limit 10
 ai-pricing prices history --model claude-opus-4
 ai-pricing prices filters --provider anthropic
 ai-pricing changes recent --limit 20
-ai-pricing gpus list
-ai-pricing health
 ```
 
 ## Output
@@ -81,4 +79,4 @@ RUN_SMOKE=1 npm test -- tests/smoke.test.ts
 
 ## License
 
-Source available; no formal license declared yet.
+[MIT](LICENSE)
